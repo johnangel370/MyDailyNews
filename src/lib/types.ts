@@ -1,5 +1,5 @@
 export interface Briefing {
-  id: string;
+  id: number;
   briefing_date: string;
   cv_section: string | null;
   llm_section: string | null;

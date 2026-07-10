@@ -14,7 +14,7 @@ const cardVariants = cva("", {
       // same category of exception Tailwind's own `shadow` utility already
       // is (a hardcoded rgb(0 0 0 / ...), not a theme token).
       glass:
-        "rounded-2xl border border-white/15 bg-card/10 text-card-foreground backdrop-blur-2xl backdrop-saturate-150 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.25),inset_0_1px_0_0_rgba(255,255,255,0.3)] dark:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6),inset_0_1px_0_0_rgba(255,255,255,0.14)]",
+        "rounded-2xl border border-white/15 bg-card/5 text-card-foreground backdrop-blur-xl backdrop-saturate-150 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.25),inset_0_1px_0_0_rgba(255,255,255,0.3)] dark:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6),inset_0_1px_0_0_rgba(255,255,255,0.14)]",
     },
   },
   defaultVariants: {

@@ -43,8 +43,8 @@ type Palette = { background: string; colorA: string; colorB: string };
 // they have real contrast against a pale backdrop.
 const DARK_PALETTE: Palette = {
   background: "#070a12",
-  colorA: "#2b5fd9",
-  colorB: "#6d4bd9",
+  colorA: "#5b8cff",
+  colorB: "#a07bff",
 };
 const LIGHT_PALETTE: Palette = {
   background: "#e9edf9",

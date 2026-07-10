@@ -41,10 +41,13 @@ type Palette = { background: string; colorA: string; colorB: string };
 // instead of trying to show the CSS gradient through the canvas. Light-mode
 // dot colors are correspondingly more saturated than the old fbm palette so
 // they have real contrast against a pale backdrop.
+// Dark theme goes warm (amber -> near-white) instead of staying in the
+// blue family: blue-on-dark-blue never pops, while gold/white against the
+// near-black navy gives the strongest contrast without clashing.
 const DARK_PALETTE: Palette = {
   background: "#070a12",
-  colorA: "#5b8cff",
-  colorB: "#a07bff",
+  colorA: "#ffc95c",
+  colorB: "#f2f5ff",
 };
 const LIGHT_PALETTE: Palette = {
   background: "#e9edf9",

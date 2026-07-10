@@ -1,4 +1,5 @@
 import { LoginBackground } from "@/components/login/login-background";
+import { ModeToggle } from "@/components/common/mode-toggle";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -22,6 +23,9 @@ export default function LoginPage({
   return (
     <div className="relative flex min-h-screen items-center justify-center p-6">
       <LoginBackground />
+      <div className="absolute right-4 top-4">
+        <ModeToggle />
+      </div>
       <Card variant="glass" className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="font-display text-xl">Daily AI Briefing</CardTitle>

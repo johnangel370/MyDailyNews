@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
+import { COOKIE_NAME } from "@/lib/auth";
 
-const COOKIE_NAME = "briefing_auth";
-
-export async function POST(request) {
+export async function POST(request: Request) {
   const response = NextResponse.redirect(new URL("/login", request.url), {
     status: 303,
   });

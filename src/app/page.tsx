@@ -1,15 +1,18 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import type { Briefing } from "@/lib/types";
 
-const SECTIONS = [
+type SectionKey = "all" | "cv_section" | "llm_section" | "multimodal_section";
+
+const SECTIONS: { key: SectionKey; label: string }[] = [
   { key: "all", label: "All sections" },
   { key: "cv_section", label: "Computer Vision" },
   { key: "llm_section", label: "LLM" },
   { key: "multimodal_section", label: "Multimodal" },
 ];
 
-function sectionText(briefing, sectionKey) {
+function sectionText(briefing: Briefing, sectionKey: SectionKey): string {
   if (sectionKey === "all") {
     return [briefing.cv_section, briefing.llm_section, briefing.multimodal_section]
       .filter(Boolean)
@@ -18,7 +21,7 @@ function sectionText(briefing, sectionKey) {
   return briefing[sectionKey] || "";
 }
 
-function matchesQuery(briefing, query) {
+function matchesQuery(briefing: Briefing, query: string): boolean {
   if (!query) return true;
   const haystack = [
     briefing.cv_section,
@@ -34,11 +37,11 @@ function matchesQuery(briefing, query) {
 }
 
 export default function HomePage() {
-  const [briefings, setBriefings] = useState([]);
+  const [briefings, setBriefings] = useState<Briefing[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
   const [query, setQuery] = useState("");
-  const [section, setSection] = useState("all");
+  const [section, setSection] = useState<SectionKey>("all");
 
   useEffect(() => {
     fetch("/api/briefings")
@@ -128,7 +131,7 @@ export default function HomePage() {
           />
           <select
             value={section}
-            onChange={(e) => setSection(e.target.value)}
+            onChange={(e) => setSection(e.target.value as SectionKey)}
             style={{
               padding: "0.55rem 0.75rem",
               borderRadius: "8px",
@@ -194,7 +197,15 @@ export default function HomePage() {
   );
 }
 
-function BriefingCard({ briefing, section, highlight }) {
+function BriefingCard({
+  briefing,
+  section,
+  highlight,
+}: {
+  briefing: Briefing;
+  section: SectionKey;
+  highlight?: boolean;
+}) {
   const text = sectionText(briefing, section);
   return (
     <div

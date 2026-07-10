@@ -1,8 +1,10 @@
-const { createClient } = require("@supabase/supabase-js");
+import "server-only";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 // Server-only client. Uses the service_role key, which bypasses Row Level
-// Security -- this file must never be imported from client components.
-function getSupabaseServerClient() {
+// Security -- this file must never be imported from client components
+// (the "server-only" import turns that mistake into a build error).
+export function getSupabaseServerClient(): SupabaseClient {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -16,5 +18,3 @@ function getSupabaseServerClient() {
     auth: { persistSession: false },
   });
 }
-
-module.exports = { getSupabaseServerClient };

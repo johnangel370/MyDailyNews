@@ -1,4 +1,6 @@
-function LoginPage({ searchParams }) {
+type LoginSearchParams = { next?: string; error?: string };
+
+function LoginPage({ searchParams }: { searchParams?: LoginSearchParams }) {
   const next = searchParams?.next || "/";
   const hasError = searchParams?.error === "1";
 

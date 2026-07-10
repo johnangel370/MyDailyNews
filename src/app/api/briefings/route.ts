@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getSupabaseServerClient } from "../../../lib/supabase";
+import { getSupabaseServerClient } from "@/lib/supabase";
 
 export const runtime = "nodejs";
 
@@ -20,6 +20,9 @@ export async function GET() {
 
     return NextResponse.json({ briefings: data });
   } catch (err) {
-    return NextResponse.json({ error: String(err.message || err) }, { status: 500 });
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : String(err) },
+      { status: 500 }
+    );
   }
 }

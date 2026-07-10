@@ -1,17 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
+import { COOKIE_NAME, expectedToken } from "@/lib/auth";
 
-const COOKIE_NAME = "briefing_auth";
-const SALT = "daily-ai-briefing-v1";
-
-async function sha256Hex(text) {
-  const data = new TextEncoder().encode(text);
-  const digest = await crypto.subtle.digest("SHA-256", data);
-  return Array.from(new Uint8Array(digest))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-}
-
-export async function middleware(request) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Always allow the login page and the login API route through.
@@ -20,7 +10,7 @@ export async function middleware(request) {
   }
 
   const cookie = request.cookies.get(COOKIE_NAME)?.value;
-  const expected = await sha256Hex(`${SALT}:${process.env.SITE_PASSWORD || ""}`);
+  const expected = await expectedToken();
 
   if (cookie && cookie === expected) {
     return NextResponse.next();

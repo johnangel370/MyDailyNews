@@ -22,7 +22,7 @@ export default function LoginPage({
   return (
     <div className="relative flex min-h-screen items-center justify-center p-6">
       <LoginBackground />
-      <Card className="w-full max-w-sm border-border/60 bg-card/80 shadow-xl backdrop-blur-md">
+      <Card variant="glass" className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="font-display text-xl">Daily AI Briefing</CardTitle>
           <CardDescription>Enter the password to view the archive.</CardDescription>

@@ -8,7 +8,7 @@ export function SiteHeader({ dates }: { dates: string[] }) {
   return (
     <header className="mb-8 flex items-center justify-between gap-3">
       <Link href="/">
-        <h1 className="font-display text-xl font-semibold tracking-tight sm:text-2xl">
+        <h1 className="font-brand text-xl font-bold tracking-tight sm:text-2xl">
           Daily AI Briefing
         </h1>
       </Link>

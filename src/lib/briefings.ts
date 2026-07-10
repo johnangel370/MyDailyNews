@@ -2,7 +2,7 @@ import { getSupabaseServerClient } from "@/lib/supabase";
 import type { Briefing } from "@/lib/types";
 
 const BRIEFING_COLUMNS =
-  "id, briefing_date, cv_section, llm_section, multimodal_section, sources, raw_markdown, created_at";
+  "id, briefing_date, cv_section, llm_section, multimodal_section, sources, cv_sources, llm_sources, multimodal_sources, raw_markdown, created_at";
 
 export async function getAllBriefings(): Promise<Briefing[]> {
   const supabase = getSupabaseServerClient();

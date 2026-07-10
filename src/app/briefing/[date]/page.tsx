@@ -5,13 +5,12 @@ import { format, isValid, parse } from "date-fns";
 import { ArrowLeft } from "lucide-react";
 
 import { SourcesBlock } from "@/components/briefing/sources-block";
-import { MarkdownContent } from "@/components/common/markdown-content";
+import { TopicSection } from "@/components/briefing/topic-section";
 import { PageShell } from "@/components/common/page-shell";
-import { SectionHeading } from "@/components/common/section-heading";
 import { SiteHeader } from "@/components/layout/site-header";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { getBriefingByDate, getBriefingDates } from "@/lib/briefings";
+import { getSourceItems, getVisibleTopics } from "@/lib/briefing-utils";
 
 export const dynamic = "force-dynamic";
 
@@ -39,11 +38,8 @@ export default async function BriefingDetailPage({ params }: Params) {
   ]);
   if (!briefing) notFound();
 
-  const sections = [
-    { label: "Computer Vision", text: briefing.cv_section },
-    { label: "LLM", text: briefing.llm_section },
-    { label: "Multimodal", text: briefing.multimodal_section },
-  ].filter((s): s is { label: string; text: string } => Boolean(s.text));
+  const topics = getVisibleTopics(briefing, "all");
+  const sourceItems = getSourceItems(briefing, "all");
 
   return (
     <PageShell>
@@ -61,23 +57,14 @@ export default async function BriefingDetailPage({ params }: Params) {
       </h2>
 
       <div className="flex flex-col gap-8">
-        {sections.map((s) => (
-          <section key={s.label}>
-            <SectionHeading accent>{s.label}</SectionHeading>
-            <Card>
-              <CardContent className="pt-6">
-                <MarkdownContent>{s.text}</MarkdownContent>
-              </CardContent>
-            </Card>
-          </section>
+        {topics.map((t) => (
+          <TopicSection key={t.key} label={t.label} text={t.text!} />
         ))}
       </div>
 
-      {briefing.sources && (
-        <div className="mt-8">
-          <SourcesBlock sources={briefing.sources} />
-        </div>
-      )}
+      <div className="mt-8">
+        <SourcesBlock items={sourceItems} />
+      </div>
     </PageShell>
   );
 }

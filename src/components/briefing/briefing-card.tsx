@@ -4,10 +4,9 @@ import Link from "next/link";
 import { motion } from "motion/react";
 
 import { EmptyState } from "@/components/common/empty-state";
-import { MarkdownContent } from "@/components/common/markdown-content";
 import { SourcesBlock } from "@/components/briefing/sources-block";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { sectionText, type SectionKey } from "@/lib/briefing-utils";
+import { TopicSection } from "@/components/briefing/topic-section";
+import { getSourceItems, getVisibleTopics, type SectionKey } from "@/lib/briefing-utils";
 import { fadeInUp } from "@/lib/motion";
 import type { Briefing } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -21,29 +20,32 @@ export function BriefingCard({
   section: SectionKey;
   highlight?: boolean;
 }) {
-  const text = sectionText(briefing, section);
+  const topics = getVisibleTopics(briefing, section);
+  const sourceItems = getSourceItems(briefing, section);
+
   return (
-    <motion.div variants={fadeInUp}>
-      <Card className={cn(highlight && "border-primary/50")}>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm">
-            <Link
-              href={`/briefing/${briefing.briefing_date}`}
-              className="font-mono text-muted-foreground transition-colors hover:text-primary"
-            >
-              {briefing.briefing_date}
-            </Link>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {text ? (
-            <MarkdownContent>{text}</MarkdownContent>
-          ) : (
-            <EmptyState>(no content for this section)</EmptyState>
-          )}
-          {briefing.sources && <SourcesBlock sources={briefing.sources} />}
-        </CardContent>
-      </Card>
+    <motion.div variants={fadeInUp} className="flex flex-col gap-4">
+      <Link
+        href={`/briefing/${briefing.briefing_date}`}
+        className={cn(
+          "font-mono text-sm transition-colors hover:text-primary",
+          highlight ? "text-primary" : "text-muted-foreground"
+        )}
+      >
+        {briefing.briefing_date}
+      </Link>
+
+      {topics.length === 0 ? (
+        <EmptyState>(no content for this section)</EmptyState>
+      ) : (
+        <div className="flex flex-col gap-6">
+          {topics.map((t) => (
+            <TopicSection key={t.key} label={t.label} text={t.text!} />
+          ))}
+        </div>
+      )}
+
+      <SourcesBlock items={sourceItems} />
     </motion.div>
   );
 }

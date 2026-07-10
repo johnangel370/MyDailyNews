@@ -9,6 +9,7 @@ const config: Config = {
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],
         display: ["var(--font-space-grotesk)", "system-ui", "sans-serif"],
         mono: ["var(--font-jetbrains-mono)", "ui-monospace", "monospace"],
+        brand: ["var(--font-space-mono)", "ui-monospace", "monospace"],
       },
       colors: {
         border: "hsl(var(--border))",

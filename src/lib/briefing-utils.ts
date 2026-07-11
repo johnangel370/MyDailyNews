@@ -16,11 +16,6 @@ export interface Topic {
   sources: string | null;
 }
 
-export interface SourceItem {
-  label?: string;
-  text: string;
-}
-
 function getTopics(briefing: Briefing): Topic[] {
   return [
     {
@@ -51,19 +46,55 @@ export function getVisibleTopics(briefing: Briefing, sectionKey: SectionKey): To
   return sectionKey === "all" ? topics : topics.filter((t) => t.key === sectionKey);
 }
 
-// Sources scoped to whatever topics are currently visible, so switching
-// the section filter also switches which links show up. Falls back to the
-// legacy flat `sources` column for older rows that predate the per-topic
-// columns.
-export function getSourceItems(briefing: Briefing, sectionKey: SectionKey): SourceItem[] {
-  const visible = getVisibleTopics(briefing, sectionKey).filter((t) => t.sources);
-  if (visible.length > 0) {
-    return visible.map((t) => ({
-      label: sectionKey === "all" ? t.label : undefined,
-      text: t.sources!,
-    }));
+export interface NewsItem {
+  title: string;
+  body: string;
+}
+
+// Split a section's markdown into individual news items for numbered
+// rendering. Strips a leading "## Topic" heading (the topic name is shown
+// outside the card), then starts a new item at each paragraph whose first
+// line is entirely bold (`**...**`). If no bold-titled items are found,
+// returns a single untitled item holding the whole body (older/plain rows
+// still render, just without numbering).
+export function parseNewsItems(sectionMarkdown: string): NewsItem[] {
+  const withoutHeading = sectionMarkdown.replace(/^\s*#{1,6}\s+.*(?:\r?\n)+/, "");
+  const blocks = withoutHeading.split(/\n\s*\n/);
+
+  const items: NewsItem[] = [];
+  const titleOnly = /^\*\*(.+?)\*\*\s*$/;
+
+  for (const rawBlock of blocks) {
+    const block = rawBlock.trim();
+    if (!block) continue;
+
+    const lines = block.split(/\r?\n/);
+    const titleMatch = lines[0].match(titleOnly);
+
+    if (titleMatch) {
+      items.push({
+        title: titleMatch[1].trim(),
+        body: lines.slice(1).join("\n").trim(),
+      });
+    } else if (items.length > 0) {
+      // Continuation of the previous item's body (e.g. a bullet list that
+      // was separated from its title by a blank line).
+      items[items.length - 1].body +=
+        (items[items.length - 1].body ? "\n\n" : "") + block;
+    } else {
+      items.push({ title: "", body: block });
+    }
   }
-  return briefing.sources ? [{ text: briefing.sources }] : [];
+
+  return items.length > 0 ? items : [{ title: "", body: withoutHeading.trim() }];
+}
+
+// Split a per-topic sources blob (one URL per line) into a clean list.
+export function parseSourceUrls(sources: string): string[] {
+  return sources
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
 }
 
 export function matchesQuery(briefing: Briefing, query: string): boolean {

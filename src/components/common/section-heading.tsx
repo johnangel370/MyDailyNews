@@ -13,7 +13,7 @@ export function SectionHeading({
     <div
       className={cn(
         "mb-3 font-display text-xs font-medium uppercase tracking-widest",
-        accent ? "text-primary" : "text-muted-foreground",
+        accent ? "text-topic-accent" : "text-muted-foreground",
         className
       )}
     >

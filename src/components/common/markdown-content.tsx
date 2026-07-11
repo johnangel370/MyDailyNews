@@ -13,8 +13,8 @@ export function MarkdownContent({
   return (
     <div
       className={cn(
-        "prose prose-sm max-w-none dark:prose-invert",
-        "prose-headings:font-display prose-a:text-primary",
+        "prose max-w-none dark:prose-invert",
+        "prose-headings:font-display prose-a:text-topic-accent",
         className
       )}
     >

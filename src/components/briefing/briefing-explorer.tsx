@@ -1,13 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { motion, useReducedMotion } from "motion/react";
 
 import { BriefingCard } from "@/components/briefing/briefing-card";
 import { BriefingFilters } from "@/components/briefing/briefing-filters";
 import { EmptyState } from "@/components/common/empty-state";
-import { SectionHeading } from "@/components/common/section-heading";
-import { staggerContainer } from "@/lib/motion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import type { SectionKey } from "@/lib/briefing-utils";
 import type { Briefing } from "@/lib/types";
 import { useBriefingFilter } from "@/hooks/use-briefing-filter";
@@ -15,11 +18,11 @@ import { useBriefingFilter } from "@/hooks/use-briefing-filter";
 export function BriefingExplorer({ briefings }: { briefings: Briefing[] }) {
   const [query, setQuery] = useState("");
   const [section, setSection] = useState<SectionKey>("all");
-  const reduceMotion = useReducedMotion();
 
   const filtered = useBriefingFilter(briefings, query, section);
-  const latest = filtered[0];
-  const history = filtered.slice(1);
+  // Latest date open by default; the rest collapsed. Multiple may be open
+  // at once (type="multiple"). defaultValue is initial-mount only.
+  const defaultOpen = filtered[0] ? [filtered[0].briefing_date] : [];
 
   return (
     <div>
@@ -30,33 +33,30 @@ export function BriefingExplorer({ briefings }: { briefings: Briefing[] }) {
         onSectionChange={setSection}
       />
 
-      {filtered.length === 0 && (
+      {filtered.length === 0 ? (
         <EmptyState>No briefings match your search yet.</EmptyState>
+      ) : (
+        <Accordion
+          type="multiple"
+          defaultValue={defaultOpen}
+          className="flex flex-col gap-2"
+        >
+          {filtered.map((b) => (
+            <AccordionItem
+              key={b.id}
+              value={b.briefing_date}
+              className="border-b-0"
+            >
+              <AccordionTrigger className="font-mono text-base font-semibold text-topic-accent hover:no-underline">
+                {b.briefing_date}
+              </AccordionTrigger>
+              <AccordionContent className="pt-2">
+                <BriefingCard briefing={b} section={section} />
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
       )}
-
-      <motion.div
-        initial={reduceMotion ? false : "hidden"}
-        animate="visible"
-        variants={staggerContainer}
-      >
-        {latest && (
-          <section className="mb-10">
-            <SectionHeading accent>Latest -- {latest.briefing_date}</SectionHeading>
-            <BriefingCard briefing={latest} section={section} highlight />
-          </section>
-        )}
-
-        {history.length > 0 && (
-          <section>
-            <SectionHeading>History</SectionHeading>
-            <div className="flex flex-col gap-4">
-              {history.map((b) => (
-                <BriefingCard key={b.id} briefing={b} section={section} />
-              ))}
-            </div>
-          </section>
-        )}
-      </motion.div>
     </div>
   );
 }

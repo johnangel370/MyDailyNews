@@ -29,6 +29,9 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 217 91% 55%;
     --radius: 0.625rem;
+    /* Accent for out-of-card text (dates, topic headings). Blue in light,
+       warm amber in dark -- mirrors the login shader node palette. */
+    --topic-accent: 217 91% 55%;
   }
 
   .dark {
@@ -51,6 +54,7 @@
     --border: 220 18% 16%;
     --input: 220 18% 16%;
     --ring: 217 100% 65%;
+    --topic-accent: 41 100% 68%;
   }
 }
 

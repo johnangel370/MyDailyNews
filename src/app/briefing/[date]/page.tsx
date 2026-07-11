@@ -4,13 +4,12 @@ import { notFound } from "next/navigation";
 import { format, isValid, parse } from "date-fns";
 import { ArrowLeft } from "lucide-react";
 
-import { SourcesBlock } from "@/components/briefing/sources-block";
 import { TopicSection } from "@/components/briefing/topic-section";
 import { PageShell } from "@/components/common/page-shell";
 import { SiteHeader } from "@/components/layout/site-header";
 import { Button } from "@/components/ui/button";
 import { getBriefingByDate, getBriefingDates } from "@/lib/briefings";
-import { getSourceItems, getVisibleTopics } from "@/lib/briefing-utils";
+import { getVisibleTopics } from "@/lib/briefing-utils";
 
 export const dynamic = "force-dynamic";
 
@@ -39,7 +38,6 @@ export default async function BriefingDetailPage({ params }: Params) {
   if (!briefing) notFound();
 
   const topics = getVisibleTopics(briefing, "all");
-  const sourceItems = getSourceItems(briefing, "all");
 
   return (
     <PageShell>
@@ -52,18 +50,14 @@ export default async function BriefingDetailPage({ params }: Params) {
         </Link>
       </Button>
 
-      <h2 className="mb-8 font-mono text-2xl font-semibold tracking-tight">
+      <h2 className="mb-8 font-mono text-2xl font-semibold tracking-tight text-topic-accent">
         {briefing.briefing_date}
       </h2>
 
       <div className="flex flex-col gap-8">
         {topics.map((t) => (
-          <TopicSection key={t.key} label={t.label} text={t.text!} />
+          <TopicSection key={t.key} label={t.label} text={t.text!} sources={t.sources} />
         ))}
-      </div>
-
-      <div className="mt-8">
-        <SourcesBlock items={sourceItems} />
       </div>
     </PageShell>
   );

@@ -28,7 +28,7 @@ export default function LoginPage({
       </div>
       <Card variant="glass" className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle className="font-brand text-xl font-bold">Daily AI Briefing</CardTitle>
+          <CardTitle className="font-newspaper text-2xl font-black">Daily AI Briefing</CardTitle>
           <CardDescription>Enter the password to view the archive.</CardDescription>
         </CardHeader>
         <CardContent>

@@ -47,7 +47,7 @@ export function BriefingExplorer({ briefings }: { briefings: Briefing[] }) {
               value={b.briefing_date}
               className="border-b-0"
             >
-              <AccordionTrigger className="font-mono text-base font-semibold text-topic-accent hover:no-underline">
+              <AccordionTrigger className="font-newspaper text-xl font-bold text-topic-accent hover:no-underline">
                 {b.briefing_date}
               </AccordionTrigger>
               <AccordionContent className="pt-2">

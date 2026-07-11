@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { format, parse } from "date-fns";
-import { CalendarDays } from "lucide-react";
+import { CalendarDays, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -19,6 +19,7 @@ import {
 export function BriefingCalendarNav({ dates }: { dates: string[] }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const dateSet = useMemo(() => new Set(dates), [dates]);
   const defaultMonth = useMemo(
@@ -30,18 +31,27 @@ export function BriefingCalendarNav({ dates }: { dates: string[] }) {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button variant="ghost" size="icon" aria-label="Browse briefings by date">
-          <CalendarDays className="h-4 w-4" />
+          {isPending ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <CalendarDays className="h-4 w-4" />
+          )}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="end">
         <Calendar
-          mode="single"
           defaultMonth={defaultMonth}
           disabled={(day) => !dateSet.has(format(day, "yyyy-MM-dd"))}
-          onSelect={(day) => {
-            if (!day) return;
+          // Stateless per-day navigation: fires on every enabled-day click,
+          // with no react-day-picker selection state to get stuck on (the
+          // old mode="single" onSelect would deselect on re-click and retain
+          // stale selection across navigations).
+          onDayClick={(day, modifiers) => {
+            if (modifiers.disabled) return;
             setOpen(false);
-            router.push(`/briefing/${format(day, "yyyy-MM-dd")}`);
+            startTransition(() => {
+              router.push(`/briefing/${format(day, "yyyy-MM-dd")}`);
+            });
           }}
         />
       </PopoverContent>

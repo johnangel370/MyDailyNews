@@ -50,7 +50,7 @@ export default async function BriefingDetailPage({ params }: Params) {
         </Link>
       </Button>
 
-      <h2 className="mb-8 font-mono text-2xl font-semibold tracking-tight text-topic-accent">
+      <h2 className="mb-8 font-newspaper text-3xl font-black tracking-tight text-topic-accent">
         {briefing.briefing_date}
       </h2>
 

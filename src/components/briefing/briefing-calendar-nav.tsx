@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { format, parse } from "date-fns";
 import { CalendarDays, Loader2 } from "lucide-react";
 
@@ -16,8 +17,9 @@ import {
 // `new Date("yyyy-MM-dd")` would parse as UTC and shift a day in
 // negative-offset timezones.
 export function BriefingCalendarNav({ dates }: { dates: string[] }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [navigating, setNavigating] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const dateSet = useMemo(() => new Set(dates), [dates]);
   const defaultMonth = useMemo(
@@ -29,7 +31,7 @@ export function BriefingCalendarNav({ dates }: { dates: string[] }) {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button variant="ghost" size="icon" aria-label="Browse briefings by date">
-          {navigating ? (
+          {isPending ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
             <CalendarDays className="h-4 w-4" />
@@ -40,15 +42,15 @@ export function BriefingCalendarNav({ dates }: { dates: string[] }) {
         <Calendar
           defaultMonth={defaultMonth}
           disabled={(day) => !dateSet.has(format(day, "yyyy-MM-dd"))}
-          // Full-page navigation (not client-side router.push) so the target
-          // date's page is always freshly server-rendered. This sidesteps the
-          // App Router client Router Cache, which could otherwise show a
-          // previously-viewed date's content on the new URL.
+          // Client-side navigation keeps the SPA feel and shows the route's
+          // loading skeleton. Fresh content is guaranteed by the server side
+          // (force-dynamic + noStore reads); no client cache staleness.
           onDayClick={(day, modifiers) => {
             if (modifiers.disabled) return;
             setOpen(false);
-            setNavigating(true);
-            window.location.assign(`/briefing/${format(day, "yyyy-MM-dd")}`);
+            startTransition(() => {
+              router.push(`/briefing/${format(day, "yyyy-MM-dd")}`);
+            });
           }}
         />
       </PopoverContent>

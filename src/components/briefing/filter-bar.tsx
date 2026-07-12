@@ -2,6 +2,7 @@
 
 import { Search } from "lucide-react";
 
+import { useFilter } from "@/components/briefing/filter-context";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -12,17 +13,12 @@ import {
 } from "@/components/ui/select";
 import { SECTIONS, type SectionKey } from "@/lib/briefing-utils";
 
-export function BriefingFilters({
-  query,
-  onQueryChange,
-  section,
-  onSectionChange,
-}: {
-  query: string;
-  onQueryChange: (query: string) => void;
-  section: SectionKey;
-  onSectionChange: (section: SectionKey) => void;
-}) {
+// Persistent search + section filter. Reads/writes the shared FilterContext
+// so its state survives navigation between dates (the enclosing (app) layout
+// is not remounted).
+export function FilterBar() {
+  const { query, setQuery, section, setSection } = useFilter();
+
   return (
     <div className="mb-8 flex flex-wrap gap-2">
       <div className="relative min-w-[220px] flex-1">
@@ -31,11 +27,11 @@ export function BriefingFilters({
           type="text"
           placeholder="Search briefings..."
           value={query}
-          onChange={(e) => onQueryChange(e.target.value)}
+          onChange={(e) => setQuery(e.target.value)}
           className="pl-9"
         />
       </div>
-      <Select value={section} onValueChange={(v) => onSectionChange(v as SectionKey)}>
+      <Select value={section} onValueChange={(v) => setSection(v as SectionKey)}>
         <SelectTrigger className="w-[180px]" aria-label="Filter by section">
           <SelectValue />
         </SelectTrigger>

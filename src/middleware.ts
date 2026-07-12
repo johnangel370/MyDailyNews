@@ -1,5 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { COOKIE_NAME, roleForToken } from "@/lib/auth";
+import {
+  COOKIE_NAME,
+  mintToken,
+  roleForToken,
+  sessionCookieOptions,
+} from "@/lib/auth";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -24,7 +29,14 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  return NextResponse.next();
+  const response = NextResponse.next();
+  // Sliding session: every authenticated request pushes the 30-minute idle
+  // window forward by re-issuing the cookie with a fresh expiry. Skip the
+  // logout route so we don't re-set the cookie it is trying to clear.
+  if (pathname !== "/api/logout") {
+    response.cookies.set(COOKIE_NAME, await mintToken(role), sessionCookieOptions());
+  }
+  return response;
 }
 
 export const config = {

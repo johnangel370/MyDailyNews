@@ -25,12 +25,30 @@ function guestPassword(): string {
   return process.env.GUEST_PASSWORD || "guest";
 }
 
-// The auth cookie value for a role: a salted hash tied to that role's
-// password (and namespaced by the role, so the two tokens never collide).
-// Rotating a password invalidates every cookie issued for it.
-export async function tokenForRole(role: Role): Promise<string> {
-  const secret = role === "admin" ? adminPassword() : guestPassword();
-  return sha256Hex(`${SALT}:${role}:${secret}`);
+function secretFor(role: Role): string {
+  return role === "admin" ? adminPassword() : guestPassword();
+}
+
+// Idle session length in ms (default 30 minutes; SESSION_MINUTES overrides).
+export function sessionMs(): number {
+  const min = Number(process.env.SESSION_MINUTES);
+  return (Number.isFinite(min) && min > 0 ? min : 30) * 60 * 1000;
+}
+
+// Keyed hash binding the role + expiry to the role's password. The secret is
+// placed LAST so the digest is not vulnerable to length-extension forgery,
+// and rotating the password invalidates every token issued for it.
+async function sign(role: Role, expiresAt: string): Promise<string> {
+  return sha256Hex(`${SALT}:${role}:${expiresAt}:${secretFor(role)}`);
+}
+
+// A fresh cookie value: "<role>.<expiresAt>.<signature>", where expiresAt is
+// now + the idle window. Re-minted on each request (see middleware) so an
+// active session slides forward; an idle one lapses once expiresAt passes.
+export async function mintToken(role: Role): Promise<string> {
+  const expiresAt = String(Date.now() + sessionMs());
+  const sig = await sign(role, expiresAt);
+  return `${role}.${expiresAt}.${sig}`;
 }
 
 // Which role a submitted password authenticates as, or null. Admin wins ties
@@ -41,12 +59,33 @@ export async function roleForPassword(password: string): Promise<Role | null> {
   return null;
 }
 
-// Which role a cookie value represents, or null.
+// Which role a cookie represents, or null -- valid only if the signature
+// matches AND the token has not expired.
 export async function roleForToken(
   cookie: string | undefined | null
 ): Promise<Role | null> {
   if (!cookie) return null;
-  if (cookie === (await tokenForRole("admin"))) return "admin";
-  if (cookie === (await tokenForRole("guest"))) return "guest";
-  return null;
+  const parts = cookie.split(".");
+  if (parts.length !== 3) return null;
+  const [role, expiresAt, sig] = parts;
+  if (role !== "admin" && role !== "guest") return null;
+
+  const expiry = Number(expiresAt);
+  if (!Number.isFinite(expiry) || Date.now() >= expiry) return null;
+
+  const expected = await sign(role, expiresAt);
+  if (sig !== expected) return null;
+  return role;
+}
+
+// Cookie attributes shared by login (mint) and middleware (refresh). It is a
+// session cookie (no maxAge) so it also clears when the browser closes; the
+// 30-minute idle limit is enforced by the signed expiry embedded in the value.
+export function sessionCookieOptions() {
+  return {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+    path: "/",
+  };
 }

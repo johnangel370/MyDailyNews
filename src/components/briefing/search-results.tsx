@@ -58,7 +58,7 @@ export function SearchResults() {
       <div className="flex flex-col gap-10">
         {visible.map(({ briefing, topics }) => (
           <div key={briefing.id}>
-            <h2 className="mb-6 font-newspaper text-2xl font-black tracking-tight text-topic-accent">
+            <h2 className="mb-6 font-display text-2xl font-black tracking-tight text-topic-accent">
               {briefing.briefing_date}
             </h2>
             {topics.map((t) => (

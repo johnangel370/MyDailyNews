@@ -25,7 +25,7 @@ export function BriefingView({ date }: { date?: string }) {
 
   return (
     <div>
-      <h2 className="mb-8 font-newspaper text-3xl font-black tracking-tight text-topic-accent">
+      <h2 className="mb-8 font-display text-3xl font-black tracking-tight text-topic-accent">
         {briefing.briefing_date}
       </h2>
       <BriefingCard briefing={briefing} section={section} />

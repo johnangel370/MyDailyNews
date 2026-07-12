@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { COOKIE_NAME, expectedToken } from "@/lib/auth";
+import { COOKIE_NAME, roleForToken } from "@/lib/auth";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -10,15 +10,21 @@ export async function middleware(request: NextRequest) {
   }
 
   const cookie = request.cookies.get(COOKIE_NAME)?.value;
-  const expected = await expectedToken();
+  const role = await roleForToken(cookie);
 
-  if (cookie && cookie === expected) {
-    return NextResponse.next();
+  if (!role) {
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("next", pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
-  const loginUrl = new URL("/login", request.url);
-  loginUrl.searchParams.set("next", pathname);
-  return NextResponse.redirect(loginUrl);
+  // Guests may only see the home page (the latest briefing) and log out;
+  // any other path (e.g. a specific /briefing/[date]) is bounced to "/".
+  if (role === "guest" && pathname !== "/" && pathname !== "/api/logout") {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {

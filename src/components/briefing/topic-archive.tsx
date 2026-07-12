@@ -41,7 +41,7 @@ export function TopicArchive({
       <div className="flex flex-col gap-10">
         {visible.map((b) => (
           <div key={b.id}>
-            <h2 className="mb-6 font-newspaper text-2xl font-black tracking-tight text-topic-accent">
+            <h2 className="mb-6 font-display text-2xl font-black tracking-tight text-topic-accent">
               {b.briefing_date}
             </h2>
             {getVisibleTopics(b, section).map((t) => (

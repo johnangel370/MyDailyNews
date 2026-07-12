@@ -32,10 +32,6 @@
     /* Accent for out-of-card text (dates, topic headings). Blue in light,
        warm amber in dark -- mirrors the login shader node palette. */
     --topic-accent: 217 91% 55%;
-    /* Newspaper paper texture (authenticated pages only, via .paper-surface).
-       Light = aged cream newsprint; grain = ink-fleck opacity. */
-    --paper-tint: 40 44% 92%;
-    --paper-grain: 0.06;
   }
 
   .dark {
@@ -59,36 +55,7 @@
     --input: 220 18% 16%;
     --ring: 217 100% 65%;
     --topic-accent: 41 100% 68%;
-    /* Dark newsprint: a warm near-black; grain kept low so cards stay legible. */
-    --paper-tint: 30 10% 8%;
-    --paper-grain: 0.05;
   }
-}
-
-/* Full-bleed vintage newspaper surface for authenticated pages. Rendered
-   as a fixed -z-10 layer inside PageShell so it never touches the login
-   page. Layers (top to bottom): fibrous grain (SVG turbulence), faint
-   newsprint halftone dots, a soft corner vignette, over the paper tint.
-   The SVG/gradient data are texture assets -- the tint colour still comes
-   from the --paper-tint token, so theme switching stays token-driven. */
-.paper-surface {
-  background-color: hsl(var(--paper-tint));
-  background-image:
-    radial-gradient(circle at 50% 38%, transparent 55%, hsl(0 0% 0% / 0.18) 100%),
-    radial-gradient(hsl(var(--foreground) / 0.16) 0.5px, transparent 0.6px);
-  background-size: 100% 100%, 5px 5px;
-  background-repeat: no-repeat, repeat;
-}
-/* Fibrous paper grain, isolated so its strength is one token (--paper-grain).
-   overlay blend adds texture in both light and dark relative to mid-grey. */
-.paper-surface::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 240px 240px;
-  opacity: var(--paper-grain);
-  mix-blend-mode: overlay;
 }
 
 @layer base {

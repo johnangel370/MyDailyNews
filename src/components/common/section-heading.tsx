@@ -12,7 +12,7 @@ export function SectionHeading({
   return (
     <div
       className={cn(
-        "mb-3 border-b border-current/20 pb-1 font-newspaper text-lg font-bold sm:text-xl",
+        "mb-3 border-b border-current/20 pb-1 font-display text-lg font-bold sm:text-xl",
         accent ? "text-topic-accent" : "text-muted-foreground",
         className
       )}

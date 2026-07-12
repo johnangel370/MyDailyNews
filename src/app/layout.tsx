@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Playfair_Display, Space_Grotesk } from "next/font/google";
+import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 
 import { ThemeProvider } from "@/components/common/theme-provider";
 import "./globals.css";
@@ -19,14 +19,6 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
 });
 
-// Newspaper serif for out-of-card chrome (brand nameplate, dates, topic
-// headings). Card interiors stay on Inter/Space Grotesk.
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  weight: ["400", "700", "900"],
-  variable: "--font-playfair",
-});
-
 export const metadata: Metadata = {
   title: "Daily AI Briefing",
   description: "Private archive of daily AI/ML briefings",
@@ -36,7 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} ${playfair.variable} min-h-screen bg-background font-sans text-foreground antialiased`}
+        className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} min-h-screen bg-background font-sans text-foreground antialiased`}
       >
         <ThemeProvider
           attribute="class"

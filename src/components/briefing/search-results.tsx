@@ -1,46 +1,79 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
 
 import { useFilter } from "@/components/briefing/filter-context";
+import { TopicSection } from "@/components/briefing/topic-section";
 import { EmptyState } from "@/components/common/empty-state";
-import { useBriefingFilter } from "@/hooks/use-briefing-filter";
+import { Pager } from "@/components/common/pager";
+import {
+  filterNewsItems,
+  getVisibleTopics,
+  parseNewsItems,
+  type Topic,
+} from "@/lib/briefing-utils";
+import type { Briefing } from "@/lib/types";
 
-// Cross-date search results, shown in place of the current-day view while the
-// search box is non-empty. Reuses useBriefingFilter (query + section) to pick
-// matching dates. Selecting one clears the search and navigates to that day.
+const PAGE_SIZE = 10;
+
+// Cross-date search results: each date with a match shows its matching topic
+// cards, expanded in place with the query highlighted. Respects the section
+// dropdown (search within that topic, or all topics when "all"). The query is
+// never cleared here, so it stays in the search box. Paginated 10 days/page.
 export function SearchResults() {
-  const router = useRouter();
-  const { briefings, query, section, setQuery } = useFilter();
-  const matches = useBriefingFilter(briefings, query, section);
+  const { briefings, query, section } = useFilter();
+  const [page, setPage] = useState(1);
+
+  const matches = useMemo(() => {
+    const q = query.trim();
+    if (!q) return [] as { briefing: Briefing; topics: Topic[] }[];
+    return briefings
+      .map((briefing) => ({
+        briefing,
+        topics: getVisibleTopics(briefing, section).filter(
+          (t) => filterNewsItems(parseNewsItems(t.text!), q).length > 0
+        ),
+      }))
+      .filter((r) => r.topics.length > 0);
+  }, [briefings, query, section]);
 
   if (matches.length === 0) {
-    return <EmptyState>No briefings match &ldquo;{query}&rdquo;.</EmptyState>;
+    return (
+      <EmptyState>
+        No news matches &ldquo;{query.trim()}&rdquo;.
+      </EmptyState>
+    );
   }
 
-  const openDate = (date: string) => {
-    setQuery("");
-    router.push(`/briefing/${date}`);
-  };
+  const totalPages = Math.ceil(matches.length / PAGE_SIZE);
+  const currentPage = Math.min(page, totalPages);
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const visible = matches.slice(start, start + PAGE_SIZE);
 
   return (
     <div>
-      <p className="mb-4 text-sm text-muted-foreground">
+      <p className="mb-6 text-sm text-muted-foreground">
         {matches.length} {matches.length === 1 ? "date" : "dates"} match
       </p>
-      <ul className="flex flex-col divide-y divide-border">
-        {matches.map((b) => (
-          <li key={b.id}>
-            <button
-              type="button"
-              onClick={() => openDate(b.briefing_date)}
-              className="w-full py-3 text-left font-newspaper text-xl font-bold text-topic-accent hover:underline"
-            >
-              {b.briefing_date}
-            </button>
-          </li>
+      <div className="flex flex-col gap-10">
+        {visible.map(({ briefing, topics }) => (
+          <div key={briefing.id}>
+            <h2 className="mb-6 font-newspaper text-2xl font-black tracking-tight text-topic-accent">
+              {briefing.briefing_date}
+            </h2>
+            {topics.map((t) => (
+              <TopicSection
+                key={t.key}
+                label={t.label}
+                text={t.text!}
+                sources={t.sources}
+                highlight={query}
+              />
+            ))}
+          </div>
         ))}
-      </ul>
+      </div>
+      <Pager page={currentPage} totalPages={totalPages} onPageChange={setPage} />
     </div>
   );
 }

@@ -99,3 +99,14 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Search-match highlight. Uses the --topic-accent token (blue in light, amber
+   in dark) so it tracks the theme. The `.prose :where(...)` selector raises
+   specificity above the typography plugin's default <mark> styling. */
+.search-highlight,
+.prose :where(mark.search-highlight):not(:where([class~="not-prose"] *)) {
+  background-color: hsl(var(--topic-accent) / 0.3);
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 1px;
+}

@@ -89,6 +89,17 @@ export function parseNewsItems(sectionMarkdown: string): NewsItem[] {
   return items.length > 0 ? items : [{ title: "", body: withoutHeading.trim() }];
 }
 
+// Keep only the news items whose title or body contains the query
+// (case-insensitive). Used by search to show just the matching items.
+export function filterNewsItems(items: NewsItem[], query: string): NewsItem[] {
+  const q = query.trim().toLowerCase();
+  if (!q) return items;
+  return items.filter(
+    (it) =>
+      it.title.toLowerCase().includes(q) || it.body.toLowerCase().includes(q)
+  );
+}
+
 // Split a per-topic sources blob (one URL per line) into a clean list.
 export function parseSourceUrls(sources: string): string[] {
   return sources

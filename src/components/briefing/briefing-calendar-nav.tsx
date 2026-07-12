@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { format, parse } from "date-fns";
 import { CalendarDays, Loader2 } from "lucide-react";
 
+import { useFilter } from "@/components/briefing/filter-context";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -18,6 +19,7 @@ import {
 // negative-offset timezones.
 export function BriefingCalendarNav({ dates }: { dates: string[] }) {
   const router = useRouter();
+  const { setSection, setQuery } = useFilter();
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
@@ -48,6 +50,11 @@ export function BriefingCalendarNav({ dates }: { dates: string[] }) {
           onDayClick={(day, modifiers) => {
             if (modifiers.disabled) return;
             setOpen(false);
+            // Picking a date means "show that full day": leave the archive /
+            // search overlay modes so ContentSwitcher falls through to the
+            // day view.
+            setSection("all");
+            setQuery("");
             startTransition(() => {
               router.push(`/briefing/${format(day, "yyyy-MM-dd")}`);
             });
